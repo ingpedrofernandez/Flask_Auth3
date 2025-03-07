@@ -26,7 +26,8 @@ class Base(DeclarativeBase):
     pass
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///flask_auth3.db"
+#app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///flask_auth3.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://flask_auth3_user:FTldvcE2c8NSdkDxCW1fuWXwxYFIl5gp@dpg-cv561sa3esus73apavqg-a/flask_auth3"
 
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
