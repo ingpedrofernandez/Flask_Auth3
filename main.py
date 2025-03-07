@@ -6,6 +6,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import sqlite3 as sql
+import psycopg
 import gunicorn
 import os
 from dotenv import load_dotenv
