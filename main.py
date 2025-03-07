@@ -6,6 +6,9 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import sqlite3 as sql
+import gunicorn
+import os
+from dotenv import load_dotenv
 import requests
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
@@ -14,7 +17,7 @@ from urllib.parse import parse_qs
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'kira'
+app.config['SECRET_KEY'] = "kira"
 
 # CREATE DATABASE
 
@@ -23,7 +26,8 @@ class Base(DeclarativeBase):
     pass
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flask_auth3.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///flask_auth3.db"
+
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -392,4 +396,4 @@ def edit_user_role(name,role):
     return render_template("edit_user_role.html", name=name, role=role, logged_in=True, users=user, datas=data, id=id)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
