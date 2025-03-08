@@ -14,7 +14,7 @@ import requests
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
-
+#pip freeze > requirements.txt
 
 
 app = Flask(__name__)
