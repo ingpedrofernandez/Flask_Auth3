@@ -14,9 +14,11 @@ from dotenv import load_dotenv
 import requests
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
+import platform
+
 
 #pip freeze > requirements.txt
-
+#psycopg==3.2.5
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "kira"
