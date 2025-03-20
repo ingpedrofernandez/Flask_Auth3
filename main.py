@@ -6,9 +6,9 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import sqlite3 as sql
-import psycopg
-import psycopg2
-import gunicorn
+#import psycopg
+#import psycopg2
+#import gunicorn
 import os
 from dotenv import load_dotenv
 import requests
@@ -30,8 +30,8 @@ class Base(DeclarativeBase):
     pass
 
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///flask_auth3.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://flask_auth3_user:FTldvcE2c8NSdkDxCW1fuWXwxYFIl5gp@dpg-cv561sa3esus73apavqg-a/flask_auth3"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///flask_auth3.db"
+#app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://flask_auth3_user:FTldvcE2c8NSdkDxCW1fuWXwxYFIl5gp@dpg-cv561sa3esus73apavqg-a/flask_auth3"
 
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
@@ -256,13 +256,21 @@ def add_user(name, role):
             destination_path = f"static/uploads/{fileobj.filename}"
             fileobj.save(destination_path)
 
+            new_user = User(
+                name=request.form.get('name'),
+                mobile=request.form.get('mobile'),
+                email=request.form.get('email'),
+                imagelink=destination_path
+            )
 
+            db.session.add(new_user)
+            db.session.commit()
 
-            con = sql.connect("instance/flask_auth3.db")
-            cur = con.cursor()
-            cur.execute("insert into user(name,mobile,email,imagelink) values (?,?,?,?)",
-                        (name, mobile, email, destination_path))
-            con.commit()
+            #con = sql.connect("instance/flask_auth3.db")
+            #cur = con.cursor()
+            #cur.execute("insert into user(name,mobile,email,imagelink) values (?,?,?,?)",
+                    #    (name, mobile, email, destination_path))
+            #con.commit()
             flash('User Added', 'success')
             return redirect(url_for("users"))
 
@@ -291,23 +299,33 @@ def edit_user(id,name,role):
 
         destination_path = ""
         fileobj = request.files['file']
-        file_extensions = ["JPG", "JPEG", "PNG", "GIF"]
-        uploaded_file_extension = fileobj.filename.split(".")[1]
-        # validating file extension
-        if (uploaded_file_extension.upper() in file_extensions):
-            destination_path = f"static/uploads/{fileobj.filename}"
-            fileobj.save(destination_path)
 
-            con = sql.connect("instance/flask_auth3.db")
-            cur = con.cursor()
-            cur.execute("update user set name=?,mobile=?,email=?,imagelink=? where id=?",
-                        (name, mobile, email, destination_path, id))
-            con.commit()
-            flash('User Updated', 'success')
-            return redirect(url_for("users"))
+        if fileobj:
+            file_extensions = ["JPG", "JPEG", "PNG", "GIF"]
+            uploaded_file_extension = fileobj.filename.split(".")[1]
+            # validating file extension
+            if (uploaded_file_extension.upper() in file_extensions):
+                destination_path = f"static/uploads/{fileobj.filename}"
+                fileobj.save(destination_path)
+
+                con = sql.connect("instance/flask_auth3.db")
+                cur = con.cursor()
+                cur.execute("update user set name=?,mobile=?,email=?,imagelink=? where id=?",
+                            (name, mobile, email, destination_path, id))
+                con.commit()
+                flash('User Updated with New Photo', 'success')
+                return redirect(url_for("users"))
+            else:
+                flash('only images are accepted', 'danger')
+                return redirect(url_for("users"))
         else:
-            flash('only images are accepted', 'danger')
-            return redirect(url_for("users"))
+             con = sql.connect("instance/flask_auth3.db")
+             cur = con.cursor()
+             cur.execute("update user set name=?,mobile=?,email=? where id=?",
+                            (name, mobile, email, id))
+             con.commit()
+             flash('User Updated without New Photo', 'success')
+             return redirect(url_for("users"))
 
 
     con = sql.connect("instance/flask_auth3.db")
@@ -401,4 +419,4 @@ def edit_user_role(name,role):
     return render_template("edit_user_role.html", name=name, role=role, logged_in=True, users=user, datas=data, id=id)
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
